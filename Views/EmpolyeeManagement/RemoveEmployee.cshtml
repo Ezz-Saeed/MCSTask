@@ -1,0 +1,52 @@
+﻿@using MCSTask.ViewModels
+@model EmployeeViewModel
+
+@{
+
+}
+
+<form asp-action="RemoveEmployee" asp-controller="EmpolyeeManagement">
+    <div class="row">
+        <div class="col-md-6">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address" class="form-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BirthDate" class="form-label"></label>
+                <input asp-for="BirthDate" class="form-control" />
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Graduation" class="form-label"></label>
+                <input asp-for="Graduation" class="form-control" />
+                <span asp-validation-for="Graduation" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmplomentTypeId" class="form-label"></label>
+                <select asp-for="EmplomentTypeId" asp-items="@Model.EmploymentTypes" class="form-control">
+                    <option value="">Select a category</option>
+                </select>
+                <span asp-validation-for="EmplomentTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Assurance" class="form-label"></label>
+                <input asp-for="Assurance" class="form-control" />
+                <span asp-validation-for="Assurance" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Salary" class="form-label"></label>
+                <input asp-for="Salary" class="form-control" />
+                <span asp-validation-for="Salary" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary mt-4">Confirm</button>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,106 @@
+﻿@using MCSExam.Models
+@model IEnumerable<Employee>
+
+
+<a asp-action="AddEmployee" class="btn btn-primary btn-lg">
+    <i class="bi bi-plus-circle-dotted"></i>
+    New Employee
+</a>
+
+<table class="table table-bordered border-primary mt-5">
+    <thead>
+        <tr class="border-primary">
+            <th scope="col">Name</th>
+            <th scope="col">Address</th>
+            <th scope="col">Birth Date</th>
+            <th scope="col">Graduation</th>
+            <th scope="col">Employment Type</th>
+            <th scope="col">Salary per hour</th>
+            <th scope="col">OverTime Hour Rate</th>
+            <th scope="col">Assurance</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var emp in Model)
+        {
+            <tr class="border border-primary">
+                <td>
+                    <div class="d-flex">
+                        <div class="pe-4">
+
+                            <div>@emp.Name</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex">
+                        <div class="d-flex flex-column justify-content-center">
+                            <div>@emp.Address</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex">
+                        <div class="d-flex flex-column justify-content-center">
+                            <div>@emp.BirthDate</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex">
+                        <div class="d-flex flex-column justify-content-center">
+                            <div>@emp.Graduation</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex">
+                        <div class="d-flex flex-column justify-content-center">
+                            <div>@emp.EmploymentType.Name</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex">
+                        <div class="d-flex flex-column justify-content-center">
+                            <div>@(emp.Salary == 0 ? string.Empty : emp.Salary)</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-flex">
+                        <div class="d-flex flex-column justify-content-center">
+                            <div>@emp.OverTimeHourRate</div>
+                        </div>
+                    </div>
+                </td>
+                    
+                <td>
+                    <div class="d-flex">
+                       <div class="d-flex flex-column justify-content-center">
+                            <div>@emp.Assurance</div>
+                       </div>
+                    </div>
+                </td>
+                                  
+
+            @* <td>
+                <div class="d-flex">
+                        <a asp-action="Update" asp-controller="EmpolyeeManagemen"  class="btn btn-primary rounded rounded-3 ">
+                        <i class="bi bi-pencil-fill">Modify</i>
+                    </a>
+                </div>
+            </td> *@
+            <td>
+                <div class="d-flex">
+                        <a onclick="confirmDeleting" asp-action="RemoveEmployee" asp-controller="EmpolyeeManagement" asp-route-name="@emp.Name" class="btn btn-danger rounded rounded-3">
+                        <i class="bi bi-trash3">Remove</i>                   
+                    </a>
+                </div>
+            </td>
+            </tr>
+        }
+    </tbody>
+</table>
