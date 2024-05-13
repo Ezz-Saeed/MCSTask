@@ -1,0 +1,15 @@
+﻿@model FilteringValueViewModel
+
+<form asp-action="Index" asp-controller="Home">
+    <div class="row">
+        <div class="col-md-6">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="XValue" class="form-label"></label>
+                <input asp-for="XValue" class="form-control" />
+                <span asp-validation-for="XValue" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary mt-4">Confirm</button>
+        </div>
+    </div>
+</form>

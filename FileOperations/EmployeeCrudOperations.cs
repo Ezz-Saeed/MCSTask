@@ -1,6 +1,7 @@
 ﻿using MCSExam.DTOs;
 using MCSExam.Models;
 using MCSTask.FileOperations;
+using MCSTask.Models;
 using MCSTask.ViewModels;
 using System.IO;
 using System.Xml.Linq;
@@ -13,7 +14,6 @@ namespace MCSExam.FileOperations
         private readonly IWebHostEnvironment _environment;
         private readonly string _filePath;
 
-        
         public EmployeeCrudOperations(IWebHostEnvironment environment)
         {
             _environment = environment;
@@ -22,59 +22,61 @@ namespace MCSExam.FileOperations
         }
 
         //Get data of the file using a stream readre instance to return a list of Employees
-        public  async Task<List<Employee>> LoadEmployeesFromFile()
+        public async Task<List<Employee>> LoadData()
         {
-            
             List<Employee> employees = new List<Employee>();
-            string line1 = "";
-            int i =0;
             try
             {
-                using (StreamReader reader = new StreamReader(_filePath))
+                var lines = await File.ReadAllLinesAsync(_filePath);
+                foreach (var line in lines)
                 {
-                    string line;
-                    while ((line = await reader.ReadLineAsync()) != null)
-                    {
-                        //Extracting data of single employees that's represented by a single line
-                        line1 = line;
-                        string[] parts = line.Split('\t');
-                        var isRightSalary = decimal.TryParse(parts[6], out decimal empSalary);
-                        var EmploymentType = new EmploymentType()
-                        {
-                            Name = parts[4],
-                            Id = parts[4],
-                        };
-                        Employee employee = new Employee
-                        {
-                            Name = parts[0],
-                            Address = parts[1],
-                            BirthDate = (parts[2]),
-                            Graduation = parts[3],
-                            EmploymentType = EmploymentType,                           
-                            Salary = isRightSalary ? empSalary : 0,
-                        };
+                    //Extracting data from each line by splitting it's parts by tab.
+                    string[] parts = line.Split('\t');
+                    var isRightSalary = decimal.TryParse(parts[6], out decimal empSalary);                   
+                    var isEightParts = parts.Length == 8;
+                    //bool isRightOverTimeHourRate =false;
+                    //decimal overTimeHourRate = 0.0m;
+                    //if (isEightParts)
 
-                        if (employee.EmploymentType.Name != "Free lancer")
-                        {
-                            
-                            employee.Assurance = parts[5];
-                        }
-                        i++;
-                        employees.Add(employee);
+                        //var IsRightOverTimeHourRate = isEightParts ? decimal.TryParse(parts[7], out decimal overTimeHourRate): false;
+
+                        var EmploymentType = new EmploymentType()
+                    {
+                        Name = parts[4],
+                        Id = parts[4],
+                    };
+                    //The model to be added to the list for displaying in the view
+                    Employee employee = new Employee
+                    {
+                        Name = parts[0],
+                        Address = parts[1],
+                        BirthDate = (parts[2]),
+                        Graduation = parts[3],
+                        EmploymentType = EmploymentType,
+                        Salary = isRightSalary ? empSalary : 0,
+                        OverTimeHourRate = isEightParts ? decimal.Parse(parts[7]) : 0,
+                    };
+
+                    if (employee.EmploymentType.Name != "Free lancer")
+                    {
+
+                        employee.Assurance = parts[5];
                     }
+                    employees.Add(employee);
                 }
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"{ex.Message}   {line1}   {i}");
+                throw new InvalidOperationException(ex.Message);
             }
-            return employees;
+            List <Employee> sortedEmps = employees.OrderBy(e => e.Name).ToList();
+            return sortedEmps;
         }
 
-        //Method to retrieve employees based on their employment type
+        //Method to filter employees based on their Employment Type.
         public async Task<IEnumerable<Employee>> GetTargetEmps(string empType)
         {
-            var employees = await LoadEmployeesFromFile();
+            var employees = await LoadData();
             var targetEmps = new List<Employee>();
             foreach(var emp in employees)
             {
@@ -86,86 +88,92 @@ namespace MCSExam.FileOperations
 
 
         //method to add new employees to the file as a text line
-        public async Task<string> AddEmployee(EmployeeViewModel employee)
+        public async Task<string> AddEmployee(EmployeeViewModel model)
         {
-            //Converting employees data to a test line with tab delimited
-            //fields, so that it matches the format of the file
-            //string address = employee.Address.Replace("\"", "\"\"");
-            string extractedValue = employee.Address.Trim('"').Replace("\"\"", "\"");
-            var newEmployee = 
-                $"{employee.Name}\t{employee.Address}{employee.BirthDate}\t{employee.Graduation}\t{employee.EmplomentTypeId}\t{employee.Assurance}\t{employee.Salary}";
+
+            //Converting employees data to a text line with tab as delimiter.
+            //preparing the line to be appended to the file.
+            List<string> newEmployees = new List<string>();
+            var assurance = model.EmplomentTypeId == "Free lancer" ? string.Empty : model.EmplomentAssuranceId;
+            model.OverTimeHourRate = GetOverTimeHourRate(model.Salary, model.EmplomentTypeId);
+            var newEmployee =
+            $"{model.Name}\t{model.Address}\t{model.BirthDate}\t{model.Graduation}\t" +
+            $"{model.EmplomentTypeId}\t{assurance}\t{model.Salary}\t{model.OverTimeHourRate}";
+            newEmployees.Add(newEmployee);
             try
             {
-                using (StreamWriter writer = File.AppendText(_filePath))
-                {
-                    await writer.WriteLineAsync(newEmployee);
-                }
+                await File.AppendAllLinesAsync(_filePath, newEmployees);
             }
-
             catch (Exception ex)
             {
                 throw new InvalidOperationException($"{ex.Message}");
-            }
-            
+            }           
             return newEmployee;
         }
 
-
-        public async Task WriteEmployeesToFile(IEnumerable<Employee> employees)
+        //To delete an model with specified properties.
+        public async Task<IEnumerable<Employee>> DeleteEmployee(EmployeeViewModel model)
         {
-            try
-            {
-                //overwrites all of the content of an existing file creates a new file
-                //var exists = File.Exists(_filePath);
-                //var fileMode = exists ? FileMode.Truncate : FileMode.Create;
-                //var file = new FileStream(_filePath, fileMode);
-
-                using (StreamWriter stream =  new StreamWriter(_filePath,false))
-                {
-                    foreach (var employee in employees)
-                    {
-                        var newEmployee =
-                            $"{employee.Name}\t\"{employee.Address}\"\t\t{employee.BirthDate}\t{employee.Graduation}\t" +
-                            $"{employee.EmploymentType.Id}\t{employee.Assurance}\t{employee.Salary}\t";
-                        await stream.WriteLineAsync(newEmployee);
-
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Error writing to file: {ex.Message}");
-            }
-        }
-
-
-        public async Task<IEnumerable<Employee>> DeleteEmployee(string name)
-        {
-            var employees = await LoadEmployeesFromFile();
-            employees = employees.Where(emp => emp.Name != name).ToList(); // Filter out employees with the specified name
-
+            var employees = await LoadData();
+            //Get the model to be removed
+            var removedEmployees = employees.Where(e  => e.Name == model.Name && e.Address == model.Address && 
+            e.BirthDate==model.BirthDate && e.Graduation==model.Graduation && e.Salary==model.Salary).ToList();
+            //excluding the model to be removed from the lsit.
+            employees = employees.Except(removedEmployees).ToList(); // Filter out employees with the specified properties
+            await ReWriteEmployeesToFile(employees);
             return employees; // Return the modified list of employees
         }
 
-        public async Task<IEnumerable<Employee>> UpdateEmployee(Employee employee)
+        //To rewrite data to the file after doing some modification.
+        public async Task ReWriteEmployeesToFile(IEnumerable<Employee> employees)
         {
-            var employees = await LoadEmployeesFromFile();
-            var emp = employees.Find(e => e.Name == employee.Name);
-            var newEmp = new Employee();
-            newEmp.Name = employee.Name;
-            newEmp.Assurance = employee.Assurance;
-            newEmp.Address = employee.Address;
-            newEmp.BirthDate = employee.BirthDate;
-            newEmp.Salary = employee.Salary;
-            newEmp.EmplomentTypeId = employee.EmplomentTypeId;
-            newEmp.EmploymentType = employee.EmploymentType;
+            using (StreamWriter stream = new StreamWriter(_filePath, false))
+            {
 
-            employees.Remove(emp);
-            employees.Add(newEmp);
-            return employees;
-            
+                foreach (var employee in employees)
+                {
+                    var assurance = employee.EmplomentTypeId == "Free lancer" ? string.Empty : employee.Assurance;
+                    var emp =
+                        $"{employee.Name}\t{employee.Address}\t{employee.BirthDate}\t{employee.Graduation}\t" +
+                        $"{employee.EmploymentType.Id}\t{assurance}\t{employee.Salary}";
+                    await stream.WriteLineAsync(emp);
+
+                }
+            }
         }
 
+        //Updating an existing model
+        public async Task UpdateEmployee(EmployeeViewModel model)
+        {
+            //Prepare data of the updated model.
+            var assurance = model.EmplomentTypeId == "Free lancer" ? string.Empty : model.EmplomentAssuranceId;
+            model.OverTimeHourRate = GetOverTimeHourRate(model.Salary, model.EmplomentTypeId);
+            var newEmp =$"{model.Name}\t{model.Address}\t{model.BirthDate}\t{model.Graduation}\t" +
+                     $"{model.EmplomentTypeId}\t{assurance}\t{model.Salary}\t{model.OverTimeHourRate}";
+            string [] lines =  File.ReadAllLines(_filePath);
+            for(int i=0; i<lines.Length; i++)
+            {
+                //Splitting the line parts by tab
+                var parts = lines[i].Split('\t');
+                //Get the old data of the model
+                if (parts[0] == model.Name )
+                    //Replacing the old data of the model with the new one.
+                    lines[i] = newEmp;
+            }
+            await File.WriteAllLinesAsync(_filePath, lines);
+        }
+
+        //Method to get OverTime Hour Rate for model based on it's salary and employemnt type.
+        public decimal GetOverTimeHourRate(decimal salary, string employmentType)
+        {
+            var overTimeHourRate = employmentType == "Hourly Payroll" ? ((salary / 30.0m) * 3.0m) / 16.0m :
+                (employmentType == "Monthly payroll" ?
+            ((salary) / 160.0m) : (employmentType == "Free lancer" ? ((salary / (30.0m * 24.0m)) * 1.5m) : 0));
+            return Math.Round(overTimeHourRate, 4);
+        }
+
+        //Method to retrieve list of Employment Types with it's Ids and Values so as to be
+        //transformed to select list items to be viewed bu UIs
         public IEnumerable<EmploymentType> GetEmploymentTypes()
         {
             var EmploymentTypes = new List<EmploymentType>()
@@ -189,17 +197,47 @@ namespace MCSExam.FileOperations
             return EmploymentTypes;
         }
 
-        public async Task<Employee> GetEmployeeByName(string name)
+        //Method to retrieve list of Employment Assurance Types with it's Ids and Values so as to be
+        //transformed to select list items to be viewed bu UIs
+        public IEnumerable<EmploymentAssurance> GetEmploymentAssurance()
         {
-            var employees = await LoadEmployeesFromFile();
-            Employee targetEmp = null;
-            foreach(var emp in employees)
+            var employmentAssurance = new List<EmploymentAssurance>()
             {
-                if(emp.Name == name)
-                    targetEmp = emp;
-            }
+                new EmploymentAssurance()
+                {
+                    Id = "Assurance",
+                    Value = "Assurance",
+                },
+                new EmploymentAssurance()
+                {
+                    Id = "No Assurance",
+                    Value = "No Assurance",
+                },
+                new EmploymentAssurance()
+                {
+                    Id = "None",
+                    Value = "None",
+                }
+            };
+            return employmentAssurance;
+        }
+
+        //Retrieving an model of a specific name
+        public async Task<Employee> GetEmployee(string name)
+        {
+            var employees = await LoadData();
+            Employee? targetEmp = employees.Find(e=> e.Name==name );
+         
             return targetEmp;
         }
 
-}
+        //To get employees with time rate greater than a specific value.
+        public async Task<List<Employee>> FilterOutEmployees(decimal xValue)
+        {
+            var employees = await LoadData();
+            var targetEmps = employees.Where(e => (e.Salary/(30*24)) > xValue).ToList();
+            return targetEmps;
+        }
+
+    }
 }

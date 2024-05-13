@@ -28,3 +28,8 @@ D:\Projects\MCSTask\obj\Debug\net7.0\refint\MCSTask.dll
 D:\Projects\MCSTask\obj\Debug\net7.0\MCSTask.pdb
 D:\Projects\MCSTask\obj\Debug\net7.0\MCSTask.genruntimeconfig.cache
 D:\Projects\MCSTask\obj\Debug\net7.0\ref\MCSTask.dll
+D:\Projects\MCSTask\obj\Debug\net7.0\MCSTask.sourcelink.json
+D:\Projects\MCSTask\bin\Debug\net7.0\AutoMapper.dll
+D:\Projects\MCSTask\bin\Debug\net7.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+D:\Projects\MCSTask\obj\Debug\net7.0\MCSTask.csproj.AssemblyReference.cache
+D:\Projects\MCSTask\obj\Debug\net7.0\MCSTask.csproj.Up2Date

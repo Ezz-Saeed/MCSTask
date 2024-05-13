@@ -2,10 +2,7 @@
 @model IEnumerable<Employee>
 
 
-<a asp-action="AddEmployee" class="btn btn-primary btn-lg">
-    <i class="bi bi-plus-circle-dotted"></i>
-    New Employee
-</a>
+
 
 <table class="table table-bordered border-primary mt-5">
     <thead>
@@ -15,7 +12,7 @@
             <th scope="col">Birth Date</th>
             <th scope="col">Graduation</th>
             <th scope="col">Employment Type</th>
-            <th scope="col">Salary per hour</th>
+            <th scope="col">Salary</th>
             <th scope="col">OverTime Hour Rate</th>
             <th scope="col">Assurance</th>
             <th scope="col">Edit</th>
@@ -65,7 +62,7 @@
                 <td>
                     <div class="d-flex">
                         <div class="d-flex flex-column justify-content-center">
-                            <div>@(emp.Salary == 0 ? string.Empty : emp.Salary)</div>
+                            <div>@emp.Salary</div>
                         </div>
                     </div>
                 </td>
@@ -84,18 +81,18 @@
                        </div>
                     </div>
                 </td>
-                                  
-
-            @* <td>
+            <td>
                 <div class="d-flex">
-                        <a asp-action="Update" asp-controller="EmpolyeeManagemen"  class="btn btn-primary rounded rounded-3 ">
+                        <a asp-action="UpdateEmployee" asp-controller="EmpolyeeManagement" asp-route-name="@emp.Name" asp-route-address="@emp.Address"
+                           asp-route-birthDate="@emp.BirthDate" asp-route-graduation="@emp.Graduation" class="btn btn-primary">
                         <i class="bi bi-pencil-fill">Modify</i>
                     </a>
                 </div>
-            </td> *@
+            </td>
             <td>
                 <div class="d-flex">
-                        <a onclick="confirmDeleting" asp-action="RemoveEmployee" asp-controller="EmpolyeeManagement" asp-route-name="@emp.Name" class="btn btn-danger rounded rounded-3">
+                        <a asp-action="RemoveEmployee" asp-controller="EmpolyeeManagement" asp-route-name="@emp.Name" asp-route-address="@emp.Address"
+                           asp-route-birthDate="@emp.BirthDate" asp-route-graduation="@emp.Graduation"class="btn btn-danger">
                         <i class="bi bi-trash3">Remove</i>                   
                     </a>
                 </div>

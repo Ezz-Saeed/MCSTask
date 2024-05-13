@@ -8,11 +8,14 @@ namespace MCSExam.DataSource
 {
     public interface IRepository
     {
-        
-        Task<ResultViewModel> GetAll(string? empType);
+        Task<ResultViewModel> GetAll();
+        Task<ResultViewModel> GetFilteredEmployees(string? empType);
         Task<ResultViewModel> Create(EmployeeViewModel employee);
         IEnumerable<SelectListItem> GetEmploymentTypes();
-        Task<ResultViewModel> Remove(string name);
-        Task<ResultViewModel> GetEmployeeByName(string name);
+        IEnumerable<SelectListItem> GetEmploymentAssurance();
+        Task<ResultViewModel> Remove(EmployeeViewModel model);
+        Task<ResultViewModel> GetEmployee(string name);
+        Task<ResultViewModel> Update(EmployeeViewModel employee);
+        Task<ResultViewModel> FilterOutEmployees(decimal xValue);
     }
 }

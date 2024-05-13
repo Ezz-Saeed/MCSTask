@@ -8,10 +8,10 @@
 <form asp-action="RemoveEmployee" asp-controller="EmpolyeeManagement">
     <div class="row">
         <div class="col-md-6">
-            <div asp-validation-summary="All" class="text-danger"></div>
+            <div asp-validation-summary="All" class="text-danger" ></div>
             <div class="form-group">
                 <label asp-for="Name" class="form-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" class="form-control"  />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -37,9 +37,9 @@
                 <span asp-validation-for="EmplomentTypeId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Assurance" class="form-label"></label>
-                <input asp-for="Assurance" class="form-control" />
-                <span asp-validation-for="Assurance" class="text-danger"></span>
+                <label asp-for="EmplomentAssuranceId" class="form-label"></label>
+                <input asp-for="EmplomentAssuranceId" class="form-control" />
+                <span asp-validation-for="EmplomentAssuranceId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Salary" class="form-label"></label>

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MCSTask")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+67ed799b1a25b59b379940a9df9353bd3b9d66ca")]
 [assembly: System.Reflection.AssemblyProductAttribute("MCSTask")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MCSTask")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
